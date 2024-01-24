@@ -5,13 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "pet_prj",
+            "name": "pet_prj_usr_run",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${fileDirname}",
+            "program": "${workspaceFolder}/app/services/usr",
             "env": {
-                "USR_DEBU":"true",
+                "USR_DEBUG":"true",
+                "USR_MODE":"debug",
             }
         }
 

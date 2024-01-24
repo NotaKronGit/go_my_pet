@@ -12,9 +12,9 @@ type Config struct {
 	Debug bool
 }
 
-const (
-	logMode = "debug"
-)
+type LogConfig struct {
+	Mode string
+}
 
 func main() {
 	log, err := initLogger("service")
@@ -36,16 +36,22 @@ func run(log *zap.SugaredLogger) error {
 	}
 
 	log.Infow("startup", "STATUS", "OK")
-	log.Info("Config value:", zap.Bool("Debug", cfg.Debug))
+	log.Infow("usr config", "config debug value:", cfg.Debug)
 
 	return nil
 }
 
 // TODO different configs and change logLevel
 func initLogger(service string) (*zap.SugaredLogger, error) {
-	switch logMode {
+	var cfg LogConfig
+
+	err := envconfig.Process("usr", &cfg)
+	if err != nil {
+		return nil, err
+	}
+	switch cfg.Mode {
 	case "debug":
-		return zap.Must(zap.NewDevelopment()).Sugar(), nil
+		return zap.Must(zap.NewDevelopment()).Sugar().Named(service), nil
 	case "prod":
 		return zap.Must(zap.NewProduction()).Sugar().Named(service), nil
 	case "newNop":
