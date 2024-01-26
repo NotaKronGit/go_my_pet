@@ -57,7 +57,7 @@ func run(log *zap.SugaredLogger) error {
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("Break the loop")
+				log.Infow("startup", "STATUS", "Break process")
 				return
 			case <-time.After(1 * time.Second):
 				process()
@@ -66,7 +66,7 @@ func run(log *zap.SugaredLogger) error {
 	}()
 
 	wg.Wait()
-	fmt.Println("Shutdown done")
+	log.Infow("startup", "STATUS", "Graceful shutdown.")
 
 	return nil
 }
