@@ -1,8 +1,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	"go.uber.org/zap"
@@ -10,6 +16,7 @@ import (
 
 type Config struct {
 	Debug bool
+	wg    *sync.WaitGroup
 }
 
 type LogConfig struct {
@@ -38,6 +45,29 @@ func run(log *zap.SugaredLogger) error {
 	log.Infow("startup", "STATUS", "OK")
 	log.Infow("usr config", "config debug value:", cfg.Debug)
 
+	ctx, stop := context.WithCancel(context.Background())
+	go waitSignalExit(stop)
+	defer stop()
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for {
+			select {
+			case <-ctx.Done():
+				fmt.Println("Break the loop")
+				return
+			case <-time.After(1 * time.Second):
+				process()
+			}
+		}
+	}()
+
+	wg.Wait()
+	fmt.Println("Shutdown done")
+
 	return nil
 }
 
@@ -49,6 +79,10 @@ func initLogger(service string) (*zap.SugaredLogger, error) {
 	if err != nil {
 		return nil, err
 	}
+	if cfg.Mode == "" {
+		cfg.Mode = "debug"
+	}
+
 	switch cfg.Mode {
 	case "debug":
 		return zap.Must(zap.NewDevelopment()).Sugar().Named(service), nil
@@ -58,4 +92,18 @@ func initLogger(service string) (*zap.SugaredLogger, error) {
 		return zap.NewNop().Sugar().Named(service), nil
 	}
 	return nil, errors.New("unknown logger mode")
+}
+
+func waitSignalExit(cancel func()) {
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	<-ch
+	cancel()
+}
+
+func process() {
+	for i := 0; i < 9; i++ {
+		fmt.Printf("step: %d\n", i)
+		time.Sleep(time.Second)
+	}
 }
