@@ -1,0 +1,16 @@
+FROM debian:bookworm-slim
+
+RUN apt update -y && apt --yes --no-install-recommends install \
+        procps \
+        curl \
+        apt-transport-https \
+        gnupg2 \ 
+        ca-certificates \
+        gosu \
+        netcat-traditional \
+        && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+WORKDIR /app
+
+COPY bin/usr_linux /app/usr
+RUN chmod -v +x usr

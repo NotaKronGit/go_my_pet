@@ -16,7 +16,6 @@ import (
 
 type Config struct {
 	Debug bool
-	wg    *sync.WaitGroup
 }
 
 type LogConfig struct {
@@ -25,7 +24,7 @@ type LogConfig struct {
 
 func main() {
 	log, err := initLogger("service")
-	defer log.Sync()
+	defer log.Sync() // nolint: errcheck
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -34,7 +33,7 @@ func main() {
 	run(log)
 }
 
-func run(log *zap.SugaredLogger) error {
+func run(log *zap.SugaredLogger) {
 	var cfg Config
 
 	err := envconfig.Process("usr", &cfg)
@@ -67,8 +66,6 @@ func run(log *zap.SugaredLogger) error {
 
 	wg.Wait()
 	log.Infow("startup", "STATUS", "Graceful shutdown.")
-
-	return nil
 }
 
 // TODO different configs and change logLevel
