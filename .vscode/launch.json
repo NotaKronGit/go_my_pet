@@ -12,7 +12,12 @@
             "program": "${workspaceFolder}/app/services/usr",
             "env": {
                 "USR_DEBUG":"true",
-                "USR_MODE":"debug",
+                "USR_LOGGER_MODE":"prod",
+                "USR_DBCONFIG_HOST":"localhost",
+                "USR_DBCONFIG_PORT":"5432",
+                "USR_DBCONFIG_USER":"pet",
+                "USR_DBCONFIG_PASSWORD":"project",
+                "USR_DBCONFIG_DBNAME":"users",
             }
         }
 

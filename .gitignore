@@ -1,5 +1,5 @@
 .idea
-vendor/
+vendor
 bin
 .DS_Store
 logs.txt
