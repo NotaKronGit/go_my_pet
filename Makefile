@@ -39,3 +39,6 @@ run: down up
 down: ; docker-compose -f docker-compose.$(type).yml down
 ps: ; docker-compose ps
 pull: ; docker-compose -f docker-compose.$(type).yml pull
+
+up-all: ; docker-compose -f docker-compose.yml up -d
+down-all: ;  docker-compose -f docker-compose.yml down
