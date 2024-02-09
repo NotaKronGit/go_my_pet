@@ -1,0 +1,6 @@
+.idea
+vendor
+bin
+.DS_Store
+logs.txt
+pg_data/pgdata/
