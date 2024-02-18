@@ -4,9 +4,9 @@ services:
   usr:
     build:
       context: .
-      dockerfile: ./ci/Dockerfile_mac
-    entrypoint: >
-      ./usr
+      dockerfile: ./ci/Dockerfile
+      args:
+        progress: plain
     environment:
       - USR_DEBUG=false
       - USR_MODE=prod

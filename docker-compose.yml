@@ -1,4 +1,4 @@
-version: '2.4'
+version: '3.8'
 
 services:
  postgres:
@@ -13,6 +13,8 @@ services:
       - pg_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - fullstack
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U pet -d users"]
       interval: 10s
@@ -28,12 +30,19 @@ services:
  usr:
     build:
       context: .
-      dockerfile: ./ci/Dockerfile_mac
-    entrypoint: >
-      ./usr
+      dockerfile: ./ci/Dockerfile
     environment:
       - USR_DEBUG=false
-      - USR_MODE=prod
+      - USR_LOGGER_MODE=prod
+      - USR_DBCONFIG_HOST=localhost
+      - USR_DBCONFIG_PORT=5432
+      - USR_DBCONFIG_USER=pet
+      - USR_DBCONFIG_PASSWORD=project
+      - USR_DBCONFIG_DBNAME=users
+    ports:
+      - "8080:8080"
+    networks:
+      - fullstack
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,3 +62,7 @@ volumes:
       type: bind
       device: $PWD/pg_data/scripts
       o: bind
+
+networks:
+  fullstack:
+    driver: bridge
